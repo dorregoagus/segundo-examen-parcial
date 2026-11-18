@@ -27,13 +27,24 @@ const userSchema = new mongoose.Schema(
     profile: { type: profileSchema, required: true },
 
     // TODO 1: agregar el campo deletedAt para la eliminación lógica (tipo Date, valor por defecto null).
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true, versionKey: false },
 );
 
 // TODO 2: definir el virtual populate "courses": cursos cuyo campo teacher referencia a este usuario.
+userSchema.virtual("courses", {
+  ref: "Course",
+  localField: "_id",
+  foreignField: "teacher",
+});
 
 // TODO 3: configurar toJSON y toObject para que incluyan los virtuals.
+userSchema.set("toJSON", { virtuals: true });
+userSchema.set("toObject", { virtuals: true });
 
 const User = mongoose.model("User", userSchema);
 

@@ -1,6 +1,7 @@
-// * ARCHIVO A COMPLETAR
-// * Estructura de cada método ya resuelta: try-catch, lectura de datos, manejo de errores y respuesta final
-// * Solo falta la consulta a la base de datos con Mongoose en cada método
+
+// ARCHIVO A COMPLETAR
+// Estructura de cada método ya resuelta: try-catch, lectura de datos, manejo de errores y respuesta final
+// Solo falta la consulta a la base de datos con Mongoose en cada método
 import { matchedData } from "express-validator";
 import Course from "../models/course.model.js";
 
@@ -10,6 +11,7 @@ export const create = async (req, res) => {
     let course;
 
     // TODO 1: crear el curso con los datos validados (data), que incluyen el teacher y los topics. Guardar el resultado en course.
+    course = await Course.create(data);
 
     return res
       .status(201)
@@ -18,7 +20,7 @@ export const create = async (req, res) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: "Error interno del servidor", data: null });
+      .json({ message: "Error al crear el curso", data: null });
   }
 };
 
@@ -27,6 +29,9 @@ export const getAll = async (req, res) => {
     let courses;
 
     // TODO 2: consultar todos los cursos con populate del teacher (traer solo su username) y de los topics. Guardar el resultado en courses.
+    courses = await Course.find()
+      .populate("teacher", "username")
+      .populate("topics");
 
     return res
       .status(200)
@@ -35,7 +40,7 @@ export const getAll = async (req, res) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: "Error interno del servidor", data: null });
+      .json({ message: "Error al obtener los cursos", data: null });
   }
 };
 
@@ -45,6 +50,9 @@ export const getById = async (req, res) => {
     let course = null;
 
     // TODO 3: consultar el curso por id con populate del teacher (traer solo su username) y de los topics. Guardar el resultado en course.
+    course = await Course.findById(id)
+      .populate("teacher", "username")
+      .populate("topics");
 
     if (!course) {
       return res
@@ -59,7 +67,7 @@ export const getById = async (req, res) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: "Error interno del servidor", data: null });
+      .json({ message: "Error al obtener el curso", data: null });
   }
 };
 
@@ -69,6 +77,12 @@ export const update = async (req, res) => {
     let course = null;
 
     // TODO 4: actualizar el curso: buscarlo por id, asignar los datos validados (data) a sus campos, incluidos los topics, guardarlo con save() y devolver el curso actualizado. Guardar el resultado en course.
+    course = await Course.findById(id);
+
+    if (course) {
+      Object.assign(course, data);
+      await course.save();
+    }
 
     if (!course) {
       return res
@@ -83,7 +97,7 @@ export const update = async (req, res) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: "Error interno del servidor", data: null });
+      .json({ message: "Error al actualizar el curso", data: null });
   }
 };
 
@@ -93,6 +107,7 @@ export const remove = async (req, res) => {
     let course = null;
 
     // TODO 5: eliminar físicamente el curso por id. Guardar el resultado en course.
+    course = await Course.findByIdAndDelete(id);
 
     if (!course) {
       return res
@@ -107,6 +122,6 @@ export const remove = async (req, res) => {
     console.error(error);
     return res
       .status(500)
-      .json({ message: "Error interno del servidor", data: null });
+      .json({ message: "Error al eliminar el curso", data: null });
   }
 };
